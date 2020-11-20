@@ -3,6 +3,8 @@ package jwt
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+	"strconv"
 
 	jwtgen "github.com/dgrijalva/jwt-go"
 	"github.com/hashicorp/terraform-plugin-sdk/helper/schema"
@@ -47,7 +49,23 @@ func resourceHashedToken() *schema.Resource {
 func createHashedJWT(d *schema.ResourceData, meta interface{}) (err error) {
 	alg := d.Get("algorithm").(string)
 	signer := jwtgen.GetSigningMethod(alg)
-	token := jwtgen.NewWithClaims(signer, jwtgen.MapClaims(d.Get("claims").(map[string]interface{})))
+
+	claims := d.Get("claims").(map[string]interface{})
+	typedClaims := make(map[string]interface{})
+
+	for k, v := range claims {
+		switch k {
+		case "iat", "nbf":
+			typedClaims[k], err = strconv.ParseInt(v.(string), 10, 64)
+		default:
+			typedClaims[k] = v
+		}
+
+		log.Printf("%v = %v (%T)", k, typedClaims[k], typedClaims[k])
+	}
+
+	//d.Set("claims", typedClaims)
+	token := jwtgen.NewWithClaims(signer, jwtgen.MapClaims(typedClaims))
 
 	secret := d.Get("secret").(string)
 
