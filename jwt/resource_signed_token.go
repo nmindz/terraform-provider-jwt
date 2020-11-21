@@ -31,10 +31,10 @@ func resourceSignedToken() *schema.Resource {
 				ForceNew:     true,
 				Sensitive:    true,
 			},
-			"claims": &schema.Schema{
-				Type:        schema.TypeMap,
+			"claims_json": &schema.Schema{
+				Type:        schema.TypeString,
 				Required:    true,
-				Description: "The token's claims",
+				Description: "The token's claims, as a JSON document",
 				ForceNew:    true,
 			},
 			"token": &schema.Schema{
@@ -48,7 +48,13 @@ func resourceSignedToken() *schema.Resource {
 func createSignedJWT(d *schema.ResourceData, meta interface{}) (err error) {
 	alg := d.Get("algorithm").(string)
 	signer := jwtgen.GetSigningMethod(alg)
-	token := jwtgen.NewWithClaims(signer, jwtgen.MapClaims(d.Get("claims").(map[string]interface{})))
+
+	claims := d.Get("claims_json").(string)
+
+	jsonClaims := make(map[string]interface{})
+	json.Unmarshal([]byte(claims), &jsonClaims)
+
+	token := jwtgen.NewWithClaims(signer, jwtgen.MapClaims(jsonClaims))
 
 	var key interface{}
 	sKey := d.Get("key").(string)
