@@ -38,8 +38,9 @@ func resourceSignedToken() *schema.Resource {
 				ForceNew:    true,
 			},
 			"token": &schema.Schema{
-				Type:     schema.TypeString,
-				Computed: true,
+				Type:      schema.TypeString,
+				Computed:  true,
+				Sensitive: true,
 			},
 		},
 	}
