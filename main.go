@@ -2,11 +2,17 @@ package main
 
 import (
 	"github.com/camptocamp/terraform-provider-jwt/jwt"
-	"github.com/hashicorp/terraform-plugin-sdk/plugin"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
+	"github.com/hashicorp/terraform-plugin-sdk/v2/plugin"
 )
+
+// Generate the Terraform provider documentation using `tfplugindocs`:
+//go:generate go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs
 
 func main() {
 	plugin.Serve(&plugin.ServeOpts{
-		ProviderFunc: jwt.Provider,
+		ProviderFunc: func() *schema.Provider {
+			return jwt.Provider()
+		},
 	})
 }
