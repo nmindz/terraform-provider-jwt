@@ -5,7 +5,7 @@ import (
 	"encoding/pem"
 	"fmt"
 
-	jwtgen "github.com/dgrijalva/jwt-go"
+	jwtgen "github.com/golang-jwt/jwt"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 )
 
